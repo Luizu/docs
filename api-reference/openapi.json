@@ -19,184 +19,10 @@
         }
       }
     },
-    "/agenda": {
-      "post": {
-        "operationId": "AgendaController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAgendaRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The Agenda has been successfully created.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AgendaDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Agenda"
-        ]
-      }
-    },
-    "/agenda/{id}/speaker": {
-      "post": {
-        "operationId": "AgendaController_createSpeaker",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAgendaSpeakerRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The Agenda Speaker has been successfully created.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AgendaSpeakerDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Agenda"
-        ]
-      }
-    },
-    "/user": {
-      "post": {
-        "operationId": "UserController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The User has been successfully created.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "User"
-        ]
-      },
-      "get": {
-        "operationId": "UserController_findAll",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "User"
-        ]
-      }
-    },
-    "/user/{id}": {
-      "get": {
-        "operationId": "UserController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Retrieve a user by id.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "User"
-        ]
-      }
-    },
     "/event": {
       "post": {
         "operationId": "EventController_create",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateEventRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "201": {
             "description": "The Event has been successfully created.",
@@ -211,34 +37,31 @@
         },
         "tags": [
           "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "get": {
-        "operationId": "EventController_list",
+        "operationId": "EventController_listPublished",
         "parameters": [
           {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "description": "filter by the event format",
-            "example": "PUBLISHED",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
+            "name": "perPage",
             "required": false,
             "in": "query",
             "schema": {
+              "minimum": 1,
               "type": "number"
             }
           },
           {
-            "name": "offset",
+            "name": "page",
             "required": false,
             "in": "query",
             "schema": {
+              "minimum": 1,
               "type": "number"
             }
           }
@@ -251,7 +74,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FindManyEventsDto"
+                    "$ref": "#/components/schemas/ListPublishedEventsDto"
                   }
                 }
               }
@@ -260,6 +83,95 @@
         },
         "tags": [
           "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/publish/{eventId}": {
+      "post": {
+        "operationId": "EventController_publish",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The Event has been successfully published."
+          }
+        },
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/privacy": {
+      "post": {
+        "operationId": "EventController_toggleStatus",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The Event privacy has been successfully changed."
+          }
+        },
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/unpublish/{eventId}": {
+      "post": {
+        "operationId": "EventController_unpublish",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The Event has been successfully unpublished."
+          }
+        },
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -300,6 +212,11 @@
         },
         "tags": [
           "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "get": {
@@ -328,13 +245,1103 @@
         },
         "tags": [
           "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "EventController_deleteDraftEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The Ticket has been successfully deleted."
+          }
+        },
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
-    "/ticket": {
+    "/event/{id}/banner": {
+      "put": {
+        "operationId": "EventController_updateBanner",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEventBannerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "EventController_deleteBanner",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The Event banner has been successfully deleted."
+          }
+        },
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/my-events": {
+      "get": {
+        "operationId": "EventController_listOwnerEvents",
+        "parameters": [
+          {
+            "name": "perPage",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner events have been successfully listed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user": {
+      "post": {
+        "operationId": "UserController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The User has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "UserController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/me": {
+      "get": {
+        "operationId": "UserController_getByToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Retrieves user information by the provided token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "operationId": "UserController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Retrieve a user by id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/verify/{token}": {
+      "post": {
+        "operationId": "UserController_verifyUser",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully verified."
+          },
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/auth": {
+      "post": {
+        "operationId": "AuthController_signIn",
+        "parameters": [
+          {
+            "name": "x-origin-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The User has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignInDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refreshToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The User has been successfully refreshed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignInDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignInDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User will receive email for password recovery."
+          },
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "operationId": "AuthController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "204": {
+            "description": "User password successfully changed."
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/event/{eventId}/agenda": {
+      "post": {
+        "operationId": "AgendaController_create",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgendaRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The Agenda has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgendaDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agenda"
+        ]
+      },
+      "get": {
+        "operationId": "AgendaController_list",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isEnabled",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "perPage",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Agendas have been successfully listed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AgendaDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agenda"
+        ]
+      }
+    },
+    "/event/{eventId}/agenda/{id}": {
+      "get": {
+        "operationId": "AgendaController_find",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Agenda has been successfully found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgendaDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agenda"
+        ]
+      },
+      "put": {
+        "operationId": "AgendaController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAgendaRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Agenda has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgendaDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agenda"
+        ]
+      },
+      "delete": {
+        "operationId": "AgendaController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The Agenda has been successfully deleted."
+          }
+        },
+        "tags": [
+          "Agenda"
+        ]
+      }
+    },
+    "/event/{eventId}/agenda/{agendaId}/speaker": {
+      "post": {
+        "operationId": "SpeakerController_create",
+        "parameters": [
+          {
+            "name": "agendaId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgendaSpeakerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The AgendaSpeaker has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgendaDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agenda Speaker"
+        ]
+      },
+      "get": {
+        "operationId": "SpeakerController_list",
+        "parameters": [
+          {
+            "name": "agendaId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The AgendaSpeakers have been successfully listed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AgendaSpeakerDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agenda Speaker"
+        ]
+      }
+    },
+    "/event/{eventId}/agenda/{agendaId}/speaker/{id}": {
+      "put": {
+        "operationId": "SpeakerController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "agendaId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAgendaSpeakerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Agenda speaker has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgendaDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agenda Speaker"
+        ]
+      },
+      "get": {
+        "operationId": "SpeakerController_find",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The AgendaSpeaker has been successfully found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgendaSpeakerDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agenda Speaker"
+        ]
+      },
+      "delete": {
+        "operationId": "SpeakerController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The Agenda speaker has been successfully deleted."
+          }
+        },
+        "tags": [
+          "Agenda Speaker"
+        ]
+      }
+    },
+    "/event/{eventId}/agenda/{agendaId}/speaker/{id}/pic": {
+      "delete": {
+        "operationId": "SpeakerController_deleteSpeakerPicture",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Speaker picture has been successfully deleted."
+          }
+        },
+        "tags": [
+          "Agenda Speaker"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/editor": {
+      "post": {
+        "operationId": "EditorController_create",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEditorRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The Event Editor has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditorDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Editor"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/editor/{id}": {
+      "delete": {
+        "operationId": "EditorController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The Event Editor has been successfully removed."
+          }
+        },
+        "tags": [
+          "Event Editor"
+        ],
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/form-field": {
+      "post": {
+        "operationId": "FormFieldController_createFormField",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFormFieldRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormFieldDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Form Field"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/form-field/by-ticket/{ticketId}": {
+      "get": {
+        "operationId": "FormFieldController_listUserFormFields",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FormFieldDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Form Field"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/form-field/admin": {
+      "post": {
+        "operationId": "FormFieldController_setGlobalFormField",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGlobalFormFieldRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FormFieldDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Form Field"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/form-field/manage": {
+      "post": {
+        "operationId": "FormFieldController_manageFormFieldsToTicket",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageTicketFormFieldsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormFieldDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Form Field"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/ticket": {
       "post": {
         "operationId": "TicketController_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -360,9 +1367,116 @@
         "tags": [
           "Ticket"
         ]
+      },
+      "get": {
+        "operationId": "TicketController_listByEvent",
+        "parameters": [
+          {
+            "name": "perPage",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "302": {
+            "description": "The Tickets have been successfully listed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ticket"
+        ]
       }
     },
-    "/ticket/{id}": {
+    "/event/{eventId}/ticket/admin": {
+      "get": {
+        "operationId": "TicketController_listAdminTicketsByEvent",
+        "parameters": [
+          {
+            "name": "perPage",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "302": {
+            "description": "The Tickets have been successfully listed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ticket"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/ticket/{id}": {
       "get": {
         "operationId": "TicketController_find",
         "parameters": [
@@ -401,6 +1515,52 @@
           "Ticket"
         ]
       },
+      "put": {
+        "operationId": "TicketController_update",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTicketRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Ticket has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ticket"
+        ]
+      },
       "delete": {
         "operationId": "TicketController_delete",
         "parameters": [
@@ -422,6 +1582,826 @@
           "Ticket"
         ]
       }
+    },
+    "/event/{eventId}/checkout": {
+      "post": {
+        "operationId": "EventCheckoutController_create",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The Event Checkout has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventCheckoutDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Checkout"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/checkout/{checkoutId}/process": {
+      "post": {
+        "operationId": "EventCheckoutController_process",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "checkoutId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessEventCheckoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The Event Checkout has been successfully processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventCheckoutDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Checkout"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/checkout/{checkoutId}": {
+      "get": {
+        "operationId": "EventCheckoutController_find",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "checkoutId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventCheckoutDto"
+                }
+              }
+            }
+          },
+          "302": {
+            "description": "The Event Checkout has been successfully found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventCheckoutDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Checkout"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/{eventId}/order/{id}/status": {
+      "get": {
+        "operationId": "OrderController_status",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Order"
+        ]
+      }
+    },
+    "/{eventId}/order/reprocess-by-event": {
+      "post": {
+        "operationId": "OrderController_reprocessByEvent",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Order"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/{eventId}/order/{id}/reprocess": {
+      "post": {
+        "operationId": "OrderController_reprocessOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Retrieves the order status from PecegePay and updates it."
+          }
+        },
+        "tags": [
+          "Order"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/participant": {
+      "get": {
+        "operationId": "EventParticipantController_listParticipants",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Participants have been successfully listed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Participant"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/participant/{participantId}": {
+      "get": {
+        "operationId": "EventParticipantController_getParticipant",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "participantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventParticipantDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Participant"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/settings": {
+      "post": {
+        "operationId": "EventSettingsController_setAdditionalSettings",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAdditionalSettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Additional settings have been successfully set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSettingsDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Settings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "EventSettingsController_getAdditionalSettings",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Additional settings have been successfully found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Settings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/settings/pecege-pay": {
+      "post": {
+        "operationId": "EventSettingsController_setPecegePaySettings",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPecegePayEventSettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PecegePay settings successfully set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PecegePaySettingsDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PecegePaySettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Settings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "EventSettingsController_getPecegePaySettings",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PecegePay settings successfully found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PecegePaySettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Settings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/settings/payment-settings": {
+      "get": {
+        "operationId": "EventSettingsController_getPublicPaymentSettings",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public payment settings successfully found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPaymentSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Event Settings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/check-in": {
+      "post": {
+        "operationId": "CheckInController_createEventCheckIn",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEventCheckInRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The check-in was succesfully made.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventCheckInCreatedDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Check-in"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/event/{eventId}/check-in/by-participant/{participantId}": {
+      "delete": {
+        "operationId": "CheckInController_deleteLastCheckIn",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "participantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The last check-in was succesfully deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Check-in"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/settings/pecege-pay": {
+      "post": {
+        "operationId": "PecegePaySettingsController_setPecegePayGlobalSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPecegePayGlobalSettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Terms have been successfully set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PecegePayGlobalSettingsDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PecegePayGlobalSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/settings/terms-and-politics/{language}": {
+      "post": {
+        "operationId": "TermsAndPoliticsSettingsController_setTermsAndPolitics",
+        "parameters": [
+          {
+            "name": "language",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetTermsAndPoliticsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Terms have been successfully set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TermsAndPoliticsDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TermsAndPoliticsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "TermsAndPoliticsSettingsController_getTermsAndPoliticsByLanguage",
+        "parameters": [
+          {
+            "name": "language",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Terms have been successfully set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TermsAndPoliticsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ]
+      }
+    },
+    "/settings/terms-and-politics": {
+      "get": {
+        "operationId": "TermsAndPoliticsSettingsController_getTermsAndPolitics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Terms have been successfully set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TermsAndPoliticsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ]
+      }
+    },
+    "/payment/pecege-pay/webhook": {
+      "post": {
+        "operationId": "PecegePayController_webhook",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "info": {
@@ -433,23 +2413,94 @@
   "tags": [],
   "servers": [
     {
-      "url": "http://localhost:3000",
+      "url": "http://localhost:8080",
       "description": "Local environment"
+    },
+    {
+      "url": "https://dev.api.linka.la",
+      "description": "Development environment"
     }
   ],
   "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
     "schemas": {
-      "CreateAgendaRequest": {
+      "AddressDto": {
         "type": "object",
         "properties": {
-          "title": {
+          "id": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "complement": {
+            "type": "string"
+          },
+          "neighborhood": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "street",
+          "number",
+          "neighborhood",
+          "city",
+          "state",
+          "country",
+          "zipCode",
+          "createdAt"
+        ]
+      },
+      "EventDto": {
+        "type": "object",
+        "properties": {
+          "name": {
             "type": "string"
           },
           "description": {
             "type": "string"
           },
-          "eventId": {
+          "format": {
+            "type": "object"
+          },
+          "bannerFile": {
             "type": "string"
+          },
+          "bannerUrl": {
+            "type": "string"
+          },
+          "status": {
+            "type": "object"
           },
           "startDate": {
             "format": "date-time",
@@ -458,13 +2509,241 @@
           "endDate": {
             "format": "date-time",
             "type": "string"
+          },
+          "manualDate": {
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressDto"
+          },
+          "organizationEmail": {
+            "type": "string"
+          },
+          "shouldShowMap": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
           }
         },
         "required": [
-          "title",
-          "eventId",
+          "name",
+          "format",
+          "id",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateAddressRequest": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "neighborhood": {
+            "type": "string"
+          },
+          "complement": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "street",
+          "number",
+          "neighborhood",
+          "complement",
+          "state",
+          "city",
+          "country",
+          "zipCode"
+        ]
+      },
+      "UpdateEventRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "ONLINE",
+              "ON_SITE"
+            ]
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "manualDate": {
+            "type": "string"
+          },
+          "isAddressMissing": {
+            "type": "boolean"
+          },
+          "address": {
+            "$ref": "#/components/schemas/CreateAddressRequest"
+          },
+          "organizationEmail": {
+            "type": "string"
+          },
+          "shouldShowMap": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
           "startDate",
           "endDate"
+        ]
+      },
+      "UpdateEventBannerRequest": {
+        "type": "object",
+        "properties": {
+          "banner": {
+            "type": "file",
+            "properties": {
+              "file": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "required": [
+          "banner"
+        ]
+      },
+      "ListPublishedEventsDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "scheduled": {
+                "required": true,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EventDto"
+                }
+              },
+              "ongoing": {
+                "required": true,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EventDto"
+                }
+              },
+              "done": {
+                "required": true,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EventDto"
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "The number of records found"
+          },
+          "perPage": {
+            "type": "number",
+            "description": "The number of to return"
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page of the returned rows"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "perPage",
+          "page"
+        ]
+      },
+      "ListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "The Event records",
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "The number of records found"
+          },
+          "perPage": {
+            "type": "number",
+            "description": "The number of to return"
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page of the returned rows"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "perPage",
+          "page"
+        ]
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "fullName",
+          "password",
+          "phone"
         ]
       },
       "UserDto": {
@@ -509,6 +2788,10 @@
             "format": "date-time",
             "type": "string",
             "description": "Update date of the User"
+          },
+          "externalId": {
+            "type": "string",
+            "description": "User id in auth driver"
           }
         },
         "required": [
@@ -518,35 +2801,96 @@
           "verifications",
           "roles",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "externalId"
         ]
       },
-      "EventDto": {
+      "SignInRequest": {
         "type": "object",
         "properties": {
-          "createdBy": {
-            "$ref": "#/components/schemas/UserDto"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/UserDto"
-          },
-          "id": {
+          "email": {
             "type": "string"
           },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "SignInDto": {
+        "type": "object",
+        "properties": {
           "name": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string",
+            "description": "Authentication token"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token"
+          },
+          "expiresIn": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Expiration date of the token"
+          }
+        },
+        "required": [
+          "token",
+          "refreshToken",
+          "expiresIn"
+        ]
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "ForgotPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "password",
+          "token"
+        ]
+      },
+      "CreateAgendaRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
             "type": "string"
           },
           "description": {
             "type": "string"
-          },
-          "format": {
-            "type": "object"
-          },
-          "bannerPath": {
-            "type": "string"
-          },
-          "status": {
-            "type": "object"
           },
           "startDate": {
             "format": "date-time",
@@ -556,35 +2900,20 @@
             "format": "date-time",
             "type": "string"
           },
-          "manualDate": {
-            "type": "string"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
+          "isEnabled": {
+            "type": "boolean"
           }
         },
         "required": [
-          "id",
-          "name",
-          "format",
-          "createdAt",
-          "updatedAt"
+          "title",
+          "startDate",
+          "endDate",
+          "isEnabled"
         ]
       },
       "AgendaDto": {
         "type": "object",
         "properties": {
-          "createdBy": {
-            "$ref": "#/components/schemas/UserDto"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/UserDto"
-          },
           "id": {
             "type": "string"
           },
@@ -593,6 +2922,9 @@
           },
           "description": {
             "type": "string"
+          },
+          "isEnabled": {
+            "type": "boolean"
           },
           "startDate": {
             "format": "date-time",
@@ -617,8 +2949,37 @@
         "required": [
           "id",
           "title",
+          "isEnabled",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "UpdateAgendaRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "isEnabled": {
+            "type": "boolean"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "isEnabled",
+          "startDate",
+          "endDate"
         ]
       },
       "CreateAgendaSpeakerRequest": {
@@ -630,8 +2991,37 @@
           "curriculum": {
             "type": "string"
           },
-          "photoUrl": {
+          "photo": {
+            "type": "file",
+            "properties": {
+              "file": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateAgendaSpeakerRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
             "type": "string"
+          },
+          "curriculum": {
+            "type": "string"
+          },
+          "photo": {
+            "type": "file",
+            "properties": {
+              "file": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
           }
         },
         "required": [
@@ -656,6 +3046,9 @@
           "agenda": {
             "$ref": "#/components/schemas/AgendaDto"
           },
+          "agendaId": {
+            "type": "string"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -668,170 +3061,224 @@
         "required": [
           "id",
           "name",
-          "agenda",
+          "agendaId",
           "createdAt"
         ]
       },
-      "CreateUserRequest": {
+      "CreateEditorRequest": {
         "type": "object",
         "properties": {
-          "email": {
-            "type": "string"
-          },
-          "fullName": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "phone": {
+          "userId": {
             "type": "string"
           }
         },
         "required": [
-          "email",
-          "fullName",
-          "password",
-          "phone"
+          "userId"
         ]
       },
-      "CreateAddressRequest": {
+      "EditorDto": {
         "type": "object",
         "properties": {
-          "street": {
+          "id": {
             "type": "string"
           },
-          "number": {
+          "userId": {
             "type": "string"
           },
-          "neighborhood": {
+          "eventId": {
             "type": "string"
           },
-          "complement": {
+          "createdAt": {
+            "format": "date-time",
             "type": "string"
           },
-          "state": {
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "eventId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateFormFieldRequest": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 50
+          },
+          "type": {
+            "enum": [
+              "TEXT",
+              "INTEGER",
+              "DECIMAL",
+              "DATE",
+              "DATETIME",
+              "PHONE_NUMBER",
+              "RADIO",
+              "CHECKBOX",
+              "CPF_CNPJ",
+              "EMAIL"
+            ],
             "type": "string"
           },
-          "city": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
-          },
-          "zipCode": {
-            "type": "string"
-          },
-          "shouldDisplayMap": {
+          "required": {
             "type": "boolean"
-          }
-        },
-        "required": [
-          "street",
-          "number",
-          "neighborhood",
-          "complement",
-          "state",
-          "city",
-          "country",
-          "zipCode",
-          "shouldDisplayMap"
-        ]
-      },
-      "CreateEventRequest": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
           },
-          "format": {
-            "type": "object"
-          },
-          "description": {
-            "type": "string"
-          },
-          "bannerPath": {
-            "type": "string"
-          },
-          "startDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "endDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "manualDate": {
-            "type": "string"
-          },
-          "address": {
-            "$ref": "#/components/schemas/CreateAddressRequest"
-          }
-        },
-        "required": [
-          "name",
-          "format"
-        ]
-      },
-      "UpdateEventRequest": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "bannerPath": {
-            "type": "string"
-          },
-          "startDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "endDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "manualDate": {
-            "type": "string"
-          },
-          "address": {
-            "$ref": "#/components/schemas/CreateAddressRequest"
-          }
-        },
-        "required": [
-          "name"
-        ]
-      },
-      "FindManyEventsDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "description": "The Event records",
+          "options": {
+            "nullable": true,
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EventDto"
+              "type": "string"
             }
           },
-          "total": {
-            "type": "number",
-            "description": "The number of Event records found"
-          },
-          "limit": {
-            "type": "number",
-            "description": "The number of event to return"
-          },
-          "offset": {
-            "type": "number",
-            "description": "The start position of the returned rows"
+          "ticketId": {
+            "type": "string"
           }
         },
         "required": [
-          "data",
-          "total",
-          "limit",
-          "offset"
+          "label",
+          "type",
+          "required",
+          "options",
+          "ticketId"
+        ]
+      },
+      "FormFieldDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "TEXT",
+              "INTEGER",
+              "DECIMAL",
+              "DATE",
+              "DATETIME",
+              "PHONE_NUMBER",
+              "RADIO",
+              "CHECKBOX",
+              "CPF_CNPJ",
+              "EMAIL"
+            ],
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "FIXED",
+              "GLOBAL",
+              "USER"
+            ],
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "label",
+          "type",
+          "scope",
+          "required",
+          "options",
+          "createdAt"
+        ]
+      },
+      "CreateGlobalFormFieldRequest": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 50
+          },
+          "type": {
+            "enum": [
+              "TEXT",
+              "INTEGER",
+              "DECIMAL",
+              "DATE",
+              "DATETIME",
+              "PHONE_NUMBER",
+              "RADIO",
+              "CHECKBOX",
+              "CPF_CNPJ",
+              "EMAIL"
+            ],
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "FIXED",
+              "GLOBAL",
+              "USER"
+            ],
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "options": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "label",
+          "type",
+          "scope",
+          "required",
+          "options"
+        ]
+      },
+      "ManageTicketFormFieldsRequest": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "string"
+          },
+          "fieldIdsToAdd": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "ticketId",
+          "fieldIdsToAdd"
         ]
       },
       "CreateTicketRequest": {
@@ -846,9 +3293,6 @@
           "type": {
             "type": "object"
           },
-          "variant": {
-            "type": "object"
-          },
           "price": {
             "type": "number"
           },
@@ -857,9 +3301,6 @@
           },
           "quantity": {
             "type": "number"
-          },
-          "eventId": {
-            "type": "string"
           },
           "startDate": {
             "format": "date-time",
@@ -874,22 +3315,18 @@
           "title",
           "description",
           "type",
-          "variant",
           "isUnlimitedQuantity",
-          "eventId",
           "startDate",
           "endDate"
         ]
       },
+      "TicketFormField": {
+        "type": "object",
+        "properties": {}
+      },
       "TicketDto": {
         "type": "object",
         "properties": {
-          "createdBy": {
-            "$ref": "#/components/schemas/UserDto"
-          },
-          "updatedBy": {
-            "$ref": "#/components/schemas/UserDto"
-          },
           "id": {
             "type": "string"
           },
@@ -900,9 +3337,6 @@
             "type": "string"
           },
           "type": {
-            "type": "object"
-          },
-          "variant": {
             "type": "object"
           },
           "price": {
@@ -928,6 +3362,12 @@
           "event": {
             "$ref": "#/components/schemas/EventDto"
           },
+          "formFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TicketFormField"
+            }
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -941,12 +3381,728 @@
           "id",
           "title",
           "type",
-          "variant",
           "isUnlimitedQuantity",
           "currentlySold",
           "event",
+          "formFields",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "UpdateTicketRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "object"
+          },
+          "price": {
+            "type": "number"
+          },
+          "isUnlimitedQuantity": {
+            "type": "boolean"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "type",
+          "isUnlimitedQuantity",
+          "startDate",
+          "endDate"
+        ]
+      },
+      "CheckoutTicketRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "quantity"
+        ]
+      },
+      "CreateCheckoutRequest": {
+        "type": "object",
+        "properties": {
+          "tickets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckoutTicketRequest"
+            }
+          }
+        },
+        "required": [
+          "tickets"
+        ]
+      },
+      "EventCheckoutDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tickets": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "eventId": {
+            "type": "string"
+          },
+          "orderNumber": {
+            "type": "number"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tickets",
+          "eventId",
+          "orderNumber",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ParticipantFormFields": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "phone"
+        ]
+      },
+      "CheckoutParticipantRequest": {
+        "type": "object",
+        "properties": {
+          "checkoutTicketId": {
+            "type": "string"
+          },
+          "availableForMailing": {
+            "type": "boolean"
+          },
+          "formFields": {
+            "$ref": "#/components/schemas/ParticipantFormFields"
+          }
+        },
+        "required": [
+          "checkoutTicketId",
+          "availableForMailing",
+          "formFields"
+        ]
+      },
+      "CheckoutPaymentCustomerRequest": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "document": {
+            "type": "string"
+          },
+          "documentType": {
+            "enum": [
+              "CPF",
+              "CNPJ",
+              "Passport"
+            ],
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "document",
+          "documentType",
+          "phone"
+        ]
+      },
+      "CreditCardExpirationDate": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "number"
+          },
+          "year": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "month",
+          "year"
+        ]
+      },
+      "CheckoutPaymentDetailsCreditCardRequest": {
+        "type": "object",
+        "properties": {
+          "installments": {
+            "type": "number",
+            "minimum": 1
+          },
+          "cardNumber": {
+            "type": "string"
+          },
+          "holderName": {
+            "type": "string"
+          },
+          "cvv": {
+            "type": "string"
+          },
+          "expirationDate": {
+            "$ref": "#/components/schemas/CreditCardExpirationDate"
+          }
+        },
+        "required": [
+          "installments",
+          "cardNumber",
+          "holderName",
+          "cvv",
+          "expirationDate"
+        ]
+      },
+      "CheckoutPaymentRequest": {
+        "type": "object",
+        "properties": {
+          "customer": {
+            "$ref": "#/components/schemas/CheckoutPaymentCustomerRequest"
+          },
+          "billingAddress": {
+            "$ref": "#/components/schemas/CreateAddressRequest"
+          },
+          "paymentMethod": {
+            "enum": [
+              "CREDIT_CARD",
+              "BOLETO",
+              "PIX",
+              "FREE"
+            ],
+            "type": "string"
+          },
+          "paymentDetails": {
+            "$ref": "#/components/schemas/CheckoutPaymentDetailsCreditCardRequest"
+          }
+        },
+        "required": [
+          "customer",
+          "billingAddress",
+          "paymentMethod",
+          "paymentDetails"
+        ]
+      },
+      "ProcessEventCheckoutRequest": {
+        "type": "object",
+        "properties": {
+          "step": {
+            "enum": [
+              "participant",
+              "payment"
+            ],
+            "type": "string"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckoutParticipantRequest"
+            }
+          },
+          "payment": {
+            "$ref": "#/components/schemas/CheckoutPaymentRequest"
+          }
+        },
+        "required": [
+          "step"
+        ]
+      },
+      "EventParticipantDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "object"
+          },
+          "ticketId": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "fullName",
+          "email",
+          "eventId",
+          "orderId",
+          "status",
+          "ticketId",
+          "phone",
+          "id",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "SetAdditionalSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "isPrivate": {
+            "type": "boolean"
+          },
+          "organizationEmail": {
+            "type": "string"
+          },
+          "shouldShowMap": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isPrivate",
+          "organizationEmail",
+          "shouldShowMap"
+        ]
+      },
+      "EventSettingsDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "enum": [
+              "financial",
+              "additional",
+              "pecege-pay"
+            ],
+            "type": "string"
+          },
+          "isPublic": {
+            "type": "boolean"
+          },
+          "properties": {
+            "type": "object"
+          },
+          "eventId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "key",
+          "isPublic",
+          "properties",
+          "eventId"
+        ]
+      },
+      "BoletoSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "daysToExpire": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 365
+          }
+        },
+        "required": [
+          "daysToExpire"
+        ]
+      },
+      "CreditCardSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "installments": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 12
+          }
+        },
+        "required": [
+          "installments"
+        ]
+      },
+      "PixSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "expireInMinutes": {
+            "type": "number",
+            "minimum": 10,
+            "maximum": 1440
+          }
+        },
+        "required": [
+          "expireInMinutes"
+        ]
+      },
+      "InvoiceSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "cnae": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "issAliquot": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "municipalActivityClassification": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "serviceDescription": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "pisAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "cofinsAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "inssAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "irAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "stateServiceProvision": {
+            "type": "string"
+          },
+          "cityServiceProvision": {
+            "type": "string"
+          },
+          "isIssRetainedAtSource": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "cnae",
+          "issAliquot",
+          "municipalActivityClassification",
+          "serviceDescription"
+        ]
+      },
+      "CostCenterType": {
+        "type": "object",
+        "properties": {
+          "costCenterId": {
+            "type": "string"
+          },
+          "percentage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "costCenterId",
+          "percentage"
+        ]
+      },
+      "ImportationAdditionalDataSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "classificationAccountId": {
+            "type": "string"
+          },
+          "classificationUspId": {
+            "type": "string"
+          },
+          "paymentAccountId": {
+            "type": "string"
+          },
+          "costCenters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CostCenterType"
+            }
+          }
+        },
+        "required": [
+          "classificationAccountId",
+          "paymentAccountId",
+          "costCenters"
+        ]
+      },
+      "SetPecegePayEventSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "paymentMethods": {
+            "items": {
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "boleto": {
+            "$ref": "#/components/schemas/BoletoSettingsRequest"
+          },
+          "creditCard": {
+            "$ref": "#/components/schemas/CreditCardSettingsRequest"
+          },
+          "pix": {
+            "$ref": "#/components/schemas/PixSettingsRequest"
+          },
+          "invoice": {
+            "$ref": "#/components/schemas/InvoiceSettingsRequest"
+          },
+          "issueInvoice": {
+            "type": "boolean"
+          },
+          "issueReceipt": {
+            "type": "boolean"
+          },
+          "importationAdditionalData": {
+            "$ref": "#/components/schemas/ImportationAdditionalDataSettingsRequest"
+          }
+        },
+        "required": [
+          "paymentMethods",
+          "issueInvoice",
+          "issueReceipt"
+        ]
+      },
+      "PecegePaySettingsDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "PublicPaymentSettingsDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "object",
+            "properties": {
+              "paymentMethods": {
+                "required": true,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "CREDIT_CARD",
+                    "BOLETO",
+                    "PIX",
+                    "FREE"
+                  ]
+                }
+              },
+              "creditCard": {
+                "required": true,
+                "type": "object",
+                "nullable": true
+              }
+            }
+          }
+        },
+        "required": [
+          "eventId",
+          "settings"
+        ]
+      },
+      "CreateEventCheckInRequest": {
+        "type": "object",
+        "properties": {
+          "tagNumber": {
+            "type": "number"
+          },
+          "orderId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tagNumber",
+          "orderId"
+        ]
+      },
+      "EventCheckInCreatedDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string"
+          },
+          "participantName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "eventId",
+          "participantName",
+          "createdAt"
+        ]
+      },
+      "SetPecegePayGlobalSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "apiBaseUrl": {
+            "type": "string"
+          },
+          "partnerAuthorizationKey": {
+            "type": "string"
+          },
+          "companyBillingDocument": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "apiBaseUrl",
+          "partnerAuthorizationKey",
+          "companyBillingDocument"
+        ]
+      },
+      "PecegePayGlobalSettingsDto": {
+        "type": "object",
+        "properties": {
+          "apiBaseUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "partnerAuthorizationKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyBillingDocument": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "apiBaseUrl",
+          "partnerAuthorizationKey",
+          "companyBillingDocument"
+        ]
+      },
+      "SetTermsAndPoliticsRequest": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 5000
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "TermsAndPoliticsDto": {
+        "type": "object",
+        "properties": {
+          "pt": {
+            "type": "string",
+            "nullable": true
+          },
+          "en": {
+            "type": "string",
+            "nullable": true
+          },
+          "es": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "pt",
+          "en",
+          "es"
         ]
       }
     }
